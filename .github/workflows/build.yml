@@ -23,8 +23,20 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Ensure Android SDK packages
+        shell: bash
+        run: |
+          SDK="${ANDROID_HOME:-$ANDROID_SDK_ROOT}"
+          echo "ANDROID_HOME=$SDK"
+          ls "$SDK" || true
+          SM=$(find "$SDK/cmdline-tools" -maxdepth 3 -name sdkmanager -type f 2>/dev/null | head -n 1)
+          echo "sdkmanager=$SM"
+          if [ -z "$SM" ]; then
+            echo "::error::sdkmanager not found under $SDK"
+            exit 1
+          fi
+          yes | "$SM" --licenses > /dev/null 2>&1 || true
+          "$SM" "platform-tools" "platforms;android-35" "build-tools;35.0.0"
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
