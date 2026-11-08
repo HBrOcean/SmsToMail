@@ -130,8 +130,8 @@ class MainActivity : AppCompatActivity() {
         }
         toast("正在发送测试邮件…")
         io.execute {
-            val ok: Boolean
-            val msg: String
+            var ok = false
+            var msg = ""
             try {
                 MailSender.send(
                     cfg,
